@@ -5,9 +5,9 @@
 }
 
 <section class="part-index-page">
-    <div class="part-index-header">
+    <div class="part-card mts-panel part-index-header">
         <h2>Frame Parts</h2>
-        <a class="part-btn part-btn-primary" href="/Engineering/FramePart/Create">Add Frame Part</a>
+        <a class="mts-btn mts-btn-primary" href="/Engineering/FramePart/Create">Add Frame Part</a>
     </div>
 
     <form class="part-index-filters" method="get">
@@ -17,77 +17,84 @@
             <option value="Active" selected="@(Model.State == "Active" ? "selected" : null)">Active</option>
             <option value="Inactive" selected="@(Model.State == "Inactive" ? "selected" : null)">Inactive</option>
         </select>
-        <input type="hidden" name="sort" value="@Model.Sort" />
-        <input type="hidden" name="dir" value="@Model.Dir" />
-        <button class="part-btn part-btn-primary" type="submit">Filter</button>
+        <div>
+            <input type="hidden" name="sort" value="@Model.Sort" />
+            <input type="hidden" name="dir" value="@Model.Dir" />
+            <button class="mts-btn mts-btn-primary" type="submit">Filter</button>
+        </div>
     </form>
 
     @if (Model.FrameParts.Count == 0)
     {
-        <section class="part-index-empty">
-            <p>No frame parts found</p>
-            <a class="part-btn part-btn-primary" href="/Engineering/FramePart/Create">Create First Frame Part</a>
+        <section class="part-card mts-panel part-index-empty">
+            <p>No frame parts found.</p>
+            <a class="mts-btn mts-btn-primary" href="/Engineering/FramePart/Create">Create First Frame Part</a>
         </section>
     }
     else
     {
-        <div class="part-index-table-wrap">
-            <table class="part-index-table">
-                <thead>
-                    <tr>
-                        <th>
-                            <a asp-page="/Engineering/FramePartIndex"
-                               asp-route-search="@Model.Search"
-                               asp-route-state="@Model.State"
-                               asp-route-sort="ItemNo"
-                               asp-route-dir="@Model.ToggleDir("ItemNo")"
-                               asp-route-page="1">Item No</a>
-                        </th>
-                        <th>
-                            <a asp-page="/Engineering/FramePartIndex"
-                               asp-route-search="@Model.Search"
-                               asp-route-state="@Model.State"
-                               asp-route-sort="Title"
-                               asp-route-dir="@Model.ToggleDir("Title")"
-                               asp-route-page="1">Title</a>
-                        </th>
-                        <th>Revision</th>
-                        <th>State</th>
-                        <th>
-                            <a asp-page="/Engineering/FramePartIndex"
-                               asp-route-search="@Model.Search"
-                               asp-route-state="@Model.State"
-                               asp-route-sort="Updated"
-                               asp-route-dir="@Model.ToggleDir("Updated")"
-                               asp-route-page="1">Updated</a>
-                        </th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var part in Model.FrameParts)
-                    {
+        <section class="part-card mts-panel">
+            <div class="part-index-table-wrap">
+                <table class="part-index-table">
+                    <thead>
                         <tr>
-                            <td>@part.ItemNo</td>
-                            <td>@part.Title</td>
-                            <td>@(part.CurrentRevision ?? "-")</td>
-                            <td>@part.LifecycleState</td>
-                            <td>@part.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                            <td>
-                                <a class="part-btn" href="/Engineering/FramePart/@part.ItemNo">Open</a>
-                            </td>
+                            <th>
+                                <a asp-page="/Engineering/FramePartIndex"
+                                   asp-route-search="@Model.Search"
+                                   asp-route-state="@Model.State"
+                                   asp-route-sort="ItemNo"
+                                   asp-route-dir="@Model.ToggleDir("ItemNo")"
+                                   asp-route-page="1">Item No</a>
+                            </th>
+                            <th>
+                                <a asp-page="/Engineering/FramePartIndex"
+                                   asp-route-search="@Model.Search"
+                                   asp-route-state="@Model.State"
+                                   asp-route-sort="Title"
+                                   asp-route-dir="@Model.ToggleDir("Title")"
+                                   asp-route-page="1">Title</a>
+                            </th>
+                            <th>Revision</th>
+                            <th>State</th>
+                            <th>
+                                <a asp-page="/Engineering/FramePartIndex"
+                                   asp-route-search="@Model.Search"
+                                   asp-route-state="@Model.State"
+                                   asp-route-sort="Updated"
+                                   asp-route-dir="@Model.ToggleDir("Updated")"
+                                   asp-route-page="1">Updated</a>
+                            </th>
+                            <th>Actions</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        @foreach (var part in Model.FrameParts)
+                        {
+                            var isActive = string.Equals(part.LifecycleState, "Active", StringComparison.OrdinalIgnoreCase);
+                            <tr>
+                                <td>@part.ItemNo</td>
+                                <td>@part.Title</td>
+                                <td>@(part.CurrentRevision ?? "-")</td>
+                                <td>
+                                    <span class="mts-badge @(isActive ? "mts-badge-success" : "mts-badge-warning")">@part.LifecycleState</span>
+                                </td>
+                                <td>@part.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>
+                                    <a class="mts-btn mts-btn-secondary" href="/Engineering/FramePart/@part.ItemNo">Open</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-        <div class="part-index-pagination">
+        <div class="part-card mts-panel part-index-pagination">
             <span>Page @Model.Page of @Model.TotalPages (@Model.TotalCount total)</span>
             <div class="part-index-pagination-links">
                 @if (Model.HasPreviousPage)
                 {
-                    <a class="part-btn"
+                    <a class="mts-btn mts-btn-secondary"
                        asp-page="/Engineering/FramePartIndex"
                        asp-route-search="@Model.Search"
                        asp-route-state="@Model.State"
@@ -97,7 +104,7 @@
                 }
                 @if (Model.HasNextPage)
                 {
-                    <a class="part-btn"
+                    <a class="mts-btn mts-btn-secondary"
                        asp-page="/Engineering/FramePartIndex"
                        asp-route-search="@Model.Search"
                        asp-route-state="@Model.State"
@@ -109,19 +116,3 @@
         </div>
     }
 </section>
-
-<style>
-    .part-index-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-    .part-index-header h2 { margin: 0; }
-    .part-index-filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-    .part-index-filters input, .part-index-filters select { min-height: 2.25rem; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; }
-    .part-index-empty { border: 1px dashed #cbd5e1; border-radius: 10px; padding: 1rem; display: grid; gap: 0.75rem; justify-items: start; }
-    .part-index-table-wrap { overflow: auto; border: 1px solid #e2e8f0; border-radius: 10px; }
-    .part-index-table { width: 100%; border-collapse: collapse; }
-    .part-index-table th, .part-index-table td { text-align: left; padding: 0.65rem 0.5rem; border-bottom: 1px solid #e2e8f0; }
-    .part-index-table th { color: #64748b; font-size: 0.82rem; font-weight: 600; background: #f8fafc; }
-    .part-index-table th a { color: inherit; text-decoration: none; }
-    .part-index-table th a:hover { text-decoration: underline; }
-    .part-index-pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; }
-    .part-index-pagination-links { display: flex; gap: 0.5rem; }
-</style>

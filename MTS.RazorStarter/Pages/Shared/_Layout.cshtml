@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - MTS</title>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mts-theme.css" asp-append-version="true" />
 </head>
 <body>
     <div class="app-shell">
         <aside class="sidebar">
             <div>
                 <div class="brand">MTS</div>
-                <div class="brand-subtitle">Razor starter</div>
+                <div class="brand-subtitle">Manufacturing Tracking System</div>
             </div>
             <nav>
-                 <a class="nav-link" href="/Stations/Dashboard">Stations Dashboard</a>
+                <a class="nav-link" href="/Stations/Dashboard">Stations Dashboard</a>
                 @foreach (var item in Navigation.GetPrimaryNav())
                 {
                     <a class="nav-link" href="@item.Url">@item.Title</a>
