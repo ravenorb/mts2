@@ -14,11 +14,64 @@ public class FramePartService
         _db = db;
     }
 
-    public async Task<List<FramePartListItemVm>> GetAllAsync(CancellationToken ct = default)
+    public async Task<(List<FramePartListItemVm> Items, int TotalCount)> GetAllAsync(
+        string? search,
+        string? state,
+        string? sort,
+        string? dir,
+        int page = 1,
+        int pageSize = 25,
+        CancellationToken ct = default)
     {
-        return await _db.Items
-            .AsNoTracking()
+        var query = _db.Items
             .Where(i => i.ItemType == ItemType.FramePart)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var normalizedSearch = search.Trim();
+            query = query.Where(i =>
+                i.ItemNo.Contains(normalizedSearch) ||
+                i.Title.Contains(normalizedSearch));
+        }
+
+        if (!string.IsNullOrWhiteSpace(state) &&
+            Enum.TryParse<LifecycleState>(state, ignoreCase: true, out var lifecycleState))
+        {
+            query = query.Where(i => i.LifecycleState == lifecycleState);
+        }
+
+        var descending = string.Equals(dir, "desc", StringComparison.OrdinalIgnoreCase);
+        query = sort switch
+        {
+            "ItemNo" => descending
+                ? query.OrderByDescending(i => i.ItemNo)
+                : query.OrderBy(i => i.ItemNo),
+            "Title" => descending
+                ? query.OrderByDescending(i => i.Title)
+                : query.OrderBy(i => i.Title),
+            "Updated" => descending
+                ? query.OrderByDescending(i => i.UpdatedAt)
+                : query.OrderBy(i => i.UpdatedAt),
+            _ => query.OrderBy(i => i.ItemNo)
+        };
+
+        var totalCount = await query.CountAsync(ct);
+
+        if (page < 1)
+        {
+            page = 1;
+        }
+
+        if (pageSize < 1)
+        {
+            pageSize = 25;
+        }
+
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(i => new FramePartListItemVm
             {
                 ItemNo = i.ItemNo,
@@ -30,8 +83,9 @@ public class FramePartService
                     .FirstOrDefault(),
                 UpdatedAt = i.UpdatedAt
             })
-            .OrderBy(i => i.ItemNo)
             .ToListAsync(ct);
+
+        return (items, totalCount);
     }
 
     public async Task CreateAsync(CreateFramePartDto dto, CancellationToken ct = default)
