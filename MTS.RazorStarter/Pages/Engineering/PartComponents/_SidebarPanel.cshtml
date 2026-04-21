@@ -1,4 +1,4 @@
-@model MTS.RazorStarter.Pages.Engineering.FramePartModel.PartDetailViewModel
+@model MTS.RazorStarter.Models.FramePartViewModel
 
 <div class="sidebar-stack">
     <section class="part-card sidebar-card">
@@ -6,11 +6,11 @@
         <dl class="meta-list">
             <div class="meta-row">
                 <dt>Created date</dt>
-                <dd>@Model.CreatedDate.ToString("yyyy-MM-dd")</dd>
+                <dd>@Model.CreatedAt.ToString("yyyy-MM-dd")</dd>
             </div>
             <div class="meta-row">
                 <dt>Last updated</dt>
-                <dd>@Model.LastUpdated.ToString("yyyy-MM-dd")</dd>
+                <dd>@Model.UpdatedAt.ToString("yyyy-MM-dd")</dd>
             </div>
             <div class="meta-row">
                 <dt>Revision count</dt>

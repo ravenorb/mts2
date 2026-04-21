@@ -1,0 +1,60 @@
+@model IReadOnlyList<MTS.RazorStarter.Models.BomRowVm>
+
+@{
+    void RenderRows(IReadOnlyList<MTS.RazorStarter.Models.BomRowVm> rows, int level, string? parentRowId)
+    {
+        foreach (var row in rows)
+        {
+            var rowId = $"bom-row-{row.ParentRevisionId}-{row.ChildRevisionId}";
+            var display = level == 0 ? "table-row" : "none";
+
+            <tr data-bom-row data-level="@level" data-row-id="@rowId" data-parent-id="@parentRowId" style="display:@display;">
+                <td class="bom-toggle-col">
+                    @if (row.HasChildren)
+                    {
+                        <button type="button" class="bom-toggle" data-bom-toggle data-target-id="@rowId" aria-expanded="false" title="Expand children">▸</button>
+                    }
+                </td>
+                <td>@(row.FindNo ?? "-")</td>
+                <td class="bom-item-cell" style="padding-left:@(0.6m + level * 1.0m)rem;">@row.ItemNo</td>
+                <td>@row.Title</td>
+                <td>@row.RevisionCode</td>
+                <td>@row.Qty.ToString("0.####")</td>
+                <td>@row.BomRole</td>
+                <td>@(string.IsNullOrWhiteSpace(row.Notes) ? "-" : row.Notes)</td>
+            </tr>
+
+            if (row.Children.Count > 0)
+            {
+                RenderRows(row.Children, level + 1, rowId);
+            }
+        }
+    }
+}
+
+@if (Model.Count == 0)
+{
+    <div class="empty-state">No BOM items linked.</div>
+}
+else
+{
+    <div class="bom-table-wrap">
+        <table class="bom-table">
+            <thead>
+                <tr>
+                    <th class="bom-toggle-col"></th>
+                    <th>Find No</th>
+                    <th>Item No</th>
+                    <th>Title</th>
+                    <th>Rev</th>
+                    <th>Qty</th>
+                    <th>Role</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ RenderRows(Model, 0, null); }
+            </tbody>
+        </table>
+    </div>
+}
