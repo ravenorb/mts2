@@ -128,6 +128,7 @@ public class FramePartService
             return byParent[parentRevisionId]
                 .Select(row => new BomRowVm
                 {
+                    Id = row.Id,
                     ParentRevisionId = row.ParentRevisionId,
                     ChildRevisionId = row.ChildRevisionId,
                     FindNo = row.FindNo,
@@ -137,6 +138,7 @@ public class FramePartService
                     Qty = row.Qty,
                     BomRole = row.BomRole.ToString(),
                     Notes = row.Notes,
+                    SourceType = row.SourceType.ToString(),
                     HasChildren = byParent.Contains(row.ChildRevisionId),
                     Children = depth + 1 < maxDepth ? BuildRows(row.ChildRevisionId, depth + 1) : new List<BomRowVm>()
                 })

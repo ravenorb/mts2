@@ -1,38 +1,6 @@
-@model IReadOnlyList<MTS.RazorStarter.Models.BomRowVm>
+@model MTS.RazorStarter.Models.FramePartViewModel
 
-@{
-    void RenderRows(IReadOnlyList<MTS.RazorStarter.Models.BomRowVm> rows, int level, string? parentRowId)
-    {
-        foreach (var row in rows)
-        {
-            var rowId = $"bom-row-{row.ParentRevisionId}-{row.ChildRevisionId}";
-            var display = level == 0 ? "table-row" : "none";
-
-            <tr data-bom-row data-level="@level" data-row-id="@rowId" data-parent-id="@parentRowId" style="display:@display;">
-                <td class="bom-toggle-col">
-                    @if (row.HasChildren)
-                    {
-                        <button type="button" class="bom-toggle" data-bom-toggle data-target-id="@rowId" aria-expanded="false" title="Expand children">▸</button>
-                    }
-                </td>
-                <td>@(row.FindNo ?? "-")</td>
-                <td class="bom-item-cell" style="padding-left:@(0.6m + level * 1.0m)rem;">@row.ItemNo</td>
-                <td>@row.Title</td>
-                <td>@row.RevisionCode</td>
-                <td>@row.Qty.ToString("0.####")</td>
-                <td>@row.BomRole</td>
-                <td>@(string.IsNullOrWhiteSpace(row.Notes) ? "-" : row.Notes)</td>
-            </tr>
-
-            if (row.Children.Count > 0)
-            {
-                RenderRows(row.Children, level + 1, rowId);
-            }
-        }
-    }
-}
-
-@if (Model.Count == 0)
+@if (Model.BomRows.Count == 0)
 {
     <div class="empty-state">No BOM items linked.</div>
 }
@@ -42,19 +10,92 @@ else
         <table class="bom-table">
             <thead>
                 <tr>
-                    <th class="bom-toggle-col"></th>
+                    <th>Source</th>
                     <th>Find No</th>
                     <th>Item No</th>
-                    <th>Title</th>
+                    <th>Description</th>
                     <th>Rev</th>
                     <th>Qty</th>
                     <th>Role</th>
                     <th>Notes</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                @{ RenderRows(Model, 0, null); }
+                @foreach (var row in Model.BomRows)
+                {
+                    var rowClass = row.SourceType == "Manual" ? "bom-row-manual" : string.Empty;
+                    <tr class="@rowClass">
+                        <td>
+                            @if (row.SourceType == "Manual")
+                            {
+                                <span title="Manual row">✎ Manual</span>
+                            }
+                            else
+                            {
+                                <span title="Auto generated row">Auto</span>
+                            }
+                        </td>
+                        <td>
+                            <input form="edit-bom-@row.Id" name="EditRow.FindNo" value="@row.FindNo" />
+                        </td>
+                        <td class="bom-item-cell">
+                            <input form="edit-bom-@row.Id" name="EditRow.ItemNo" value="@row.ItemNo" required />
+                        </td>
+                        <td>
+                            <input form="edit-bom-@row.Id" name="EditRow.Description" value="@row.Title" />
+                        </td>
+                        <td>@row.RevisionCode</td>
+                        <td>
+                            <input form="edit-bom-@row.Id" type="number" step="0.0001" min="0.0001" name="EditRow.Qty" value="@row.Qty" required />
+                        </td>
+                        <td>
+                            <select form="edit-bom-@row.Id" name="EditRow.BomRole">
+                                <option selected="@(row.BomRole == "Component")" value="Component">Component</option>
+                                <option selected="@(row.BomRole == "Subassembly")" value="Subassembly">Subassembly</option>
+                                <option selected="@(row.BomRole == "Hardware")" value="Hardware">Hardware</option>
+                                <option selected="@(row.BomRole == "Consumable")" value="Consumable">Consumable</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input form="edit-bom-@row.Id" name="EditRow.Notes" value="@row.Notes" />
+                        </td>
+                        <td class="bom-actions-cell">
+                            <form id="edit-bom-@row.Id" method="post" asp-page-handler="SaveBomRow" asp-route-itemNo="@Model.ItemNo">
+                                <input type="hidden" name="EditRow.Id" value="@row.Id" />
+                                <input type="hidden" name="EditRow.ParentRevisionId" value="@Model.CurrentRevisionId" />
+                                <button type="submit" class="part-btn">Save</button>
+                            </form>
+                            <form method="post" asp-page-handler="DeleteBomRow" asp-route-itemNo="@Model.ItemNo" asp-route-bomId="@row.Id" onsubmit="return confirm('Delete BOM row?');">
+                                <button type="submit" class="part-btn">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
 }
+
+<div class="bom-add-row-panel">
+    <h4>Add BOM row</h4>
+    <form method="post" asp-page-handler="SaveBomRow" asp-route-itemNo="@Model.ItemNo" class="bom-add-row-form">
+        <input type="hidden" name="EditRow.ParentRevisionId" value="@Model.CurrentRevisionId" />
+        <input name="EditRow.FindNo" placeholder="Find No" />
+        <input name="EditRow.ItemNo" placeholder="Item No" required />
+        <input name="EditRow.Description" placeholder="Description" required />
+        <input name="EditRow.Qty" type="number" step="0.0001" min="0.0001" value="1" required />
+        <input name="EditRow.BomRole" value="Component" />
+        <input name="EditRow.Notes" placeholder="Notes" />
+        <button type="submit" class="part-btn part-btn-primary">Add Row</button>
+    </form>
+</div>
+
+<div class="bom-upload-panel">
+    <h4>Generate / Merge eBOM from drawing export</h4>
+    <p class="small-muted">Upload CSV columns: FindNo, ItemNo, Description, Qty, Notes.</p>
+    <form method="post" enctype="multipart/form-data" asp-page-handler="GenerateBom" asp-route-itemNo="@Model.ItemNo" class="bom-upload-form">
+        <input type="file" name="BomUpload" accept=".csv,.txt" required />
+        <button type="submit" class="part-btn part-btn-primary">Generate eBOM</button>
+    </form>
+</div>

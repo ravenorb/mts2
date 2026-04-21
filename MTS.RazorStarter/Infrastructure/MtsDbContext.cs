@@ -220,6 +220,7 @@ public class MtsDbContext : DbContext
             e.Property(x => x.LinkType).HasColumnName("link_type").HasConversion<string>().IsRequired();
             e.Property(x => x.IsPrimary).HasColumnName("is_primary").IsRequired();
             e.Property(x => x.Notes).HasColumnName("notes");
+            e.Property(x => x.SourceType).HasColumnName("source_type").HasConversion<string>().IsRequired();
 
             e.HasIndex(x => new { x.FramePartRevisionId, x.CutSheetRevisionId, x.LinkType }).IsUnique();
 
@@ -249,6 +250,7 @@ public class MtsDbContext : DbContext
             e.Property(x => x.BomRole).HasColumnName("bom_role").HasConversion<string>().IsRequired();
             e.Property(x => x.SortOrder).HasColumnName("sort_order").IsRequired();
             e.Property(x => x.Notes).HasColumnName("notes");
+            e.Property(x => x.SourceType).HasColumnName("source_type").HasConversion<string>().IsRequired();
 
             e.HasOne(x => x.ParentRevision)
                 .WithMany(x => x.BomChildren)
@@ -276,7 +278,6 @@ public class MtsDbContext : DbContext
             e.Property(x => x.Description).HasColumnName("description");
             e.Property(x => x.Qty).HasColumnName("qty").HasColumnType("decimal(18,4)");
             e.Property(x => x.Notes).HasColumnName("notes");
-
             e.HasOne(x => x.CutSheetRevision)
                 .WithMany(x => x.CutSheetBomLines)
                 .HasForeignKey(x => x.CutSheetRevisionId)

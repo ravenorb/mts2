@@ -10,6 +10,8 @@ builder.Services.AddScoped<FramePartService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<StationDashboardService>();
 builder.Services.AddScoped<NavigationService>();
+builder.Services.AddScoped<BomService>();
+builder.Services.AddScoped<FrameBomExtractor>();
 
 // Razor Pages + Auth
 builder.Services.AddRazorPages(options =>

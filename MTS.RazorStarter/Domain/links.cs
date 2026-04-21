@@ -37,6 +37,7 @@ public class ItemBom
     public BomRole BomRole { get; set; } = BomRole.Component;
     public int SortOrder { get; set; }
     public string? Notes { get; set; }
+    public BomSourceType SourceType { get; set; } = BomSourceType.Manual;
 
     public ItemRevision ParentRevision { get; set; } = null!;
     public ItemRevision ChildRevision { get; set; } = null!;
