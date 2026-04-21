@@ -12,6 +12,8 @@ builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<StationDashboardService>();
 builder.Services.AddScoped<NavigationService>();
 builder.Services.AddScoped<BomService>();
+builder.Services.AddScoped<BomMergeService>();
+builder.Services.AddScoped<BomImportService>();
 builder.Services.AddScoped<FrameBomExtractor>();
 
 // Razor Pages + Auth

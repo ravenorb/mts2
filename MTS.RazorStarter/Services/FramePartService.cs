@@ -151,7 +151,7 @@ public class FramePartService
                     Qty = row.Qty,
                     BomRole = row.BomRole.ToString(),
                     Notes = row.Notes,
-                    SourceType = row.SourceType.ToString(),
+                    SourceType = row.SourceType,
                     HasChildren = byParent.Contains(row.ChildRevisionId),
                     Children = depth + 1 < maxDepth ? BuildRows(row.ChildRevisionId, depth + 1) : new List<BomRowVm>()
                 })

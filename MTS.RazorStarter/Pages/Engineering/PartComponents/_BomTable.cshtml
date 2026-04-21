@@ -1,3 +1,4 @@
+@using Mts.Domain
 @model MTS.RazorStarter.Models.FramePartViewModel
 
 @if (Model.BomRows.Count == 0)
@@ -24,16 +25,20 @@ else
             <tbody>
                 @foreach (var row in Model.BomRows)
                 {
-                    var rowClass = row.SourceType == "Manual" ? "bom-row-manual" : string.Empty;
+                    var rowClass = row.SourceType == BomSourceType.Manual ? "bom-row-manual" : string.Empty;
                     <tr class="@rowClass">
                         <td>
-                            @if (row.SourceType == "Manual")
+                            @if (row.SourceType == BomSourceType.Manual)
                             {
-                                <span title="Manual row">✎ Manual</span>
+                                <span title="Manual row">✏️</span>
+                            }
+                            else if (row.SourceType == BomSourceType.Csv)
+                            {
+                                <span title="CSV imported row">📊</span>
                             }
                             else
                             {
-                                <span title="Auto generated row">Auto</span>
+                                <span title="Drawing generated row">📄</span>
                             }
                         </td>
                         <td>
@@ -92,10 +97,14 @@ else
 </div>
 
 <div class="bom-upload-panel">
-    <h4>Generate / Merge eBOM from drawing export</h4>
-    <p class="small-muted">Upload CSV columns: FindNo, ItemNo, Description, Qty, Notes.</p>
-    <form method="post" enctype="multipart/form-data" asp-page-handler="GenerateBom" asp-route-itemNo="@Model.ItemNo" class="bom-upload-form">
+    <h4>eBOM generation and CSV override</h4>
+    <form method="post" asp-page-handler="GenerateBom" asp-route-itemNo="@Model.ItemNo" class="bom-upload-form">
+        <button type="submit" class="part-btn part-btn-primary">Generate from Drawing</button>
+    </form>
+
+    <p class="small-muted">CSV columns: FindNo, ItemNo, Description, Qty, Notes.</p>
+    <form method="post" enctype="multipart/form-data" asp-page-handler="ImportCsv" asp-route-itemNo="@Model.ItemNo" class="bom-upload-form">
         <input type="file" name="BomUpload" accept=".csv,.txt" required />
-        <button type="submit" class="part-btn part-btn-primary">Generate eBOM</button>
+        <button type="submit" class="part-btn part-btn-primary">Import CSV</button>
     </form>
 </div>
