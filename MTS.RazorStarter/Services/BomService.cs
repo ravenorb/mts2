@@ -35,7 +35,7 @@ public class BomService
                 Qty = x.Qty,
                 BomRole = x.BomRole.ToString(),
                 Notes = x.Notes,
-                SourceType = x.SourceType.ToString()
+                SourceType = x.SourceType
             })
             .ToListAsync();
     }

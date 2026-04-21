@@ -1,3 +1,5 @@
+using Mts.Domain;
+
 namespace MTS.RazorStarter.Models;
 
 public class FramePartViewModel
@@ -44,7 +46,7 @@ public class BomRowVm
     public decimal Qty { get; set; }
     public string BomRole { get; set; } = string.Empty;
     public string? Notes { get; set; }
-    public string SourceType { get; set; } = "Manual";
+    public BomSourceType SourceType { get; set; } = BomSourceType.Manual;
     public bool HasChildren { get; set; }
     public List<BomRowVm> Children { get; set; } = new();
 }

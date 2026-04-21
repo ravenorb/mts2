@@ -13,19 +13,22 @@ public class FramePartModel : PageModel
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly BomService _bomService;
     private readonly FrameBomExtractor _frameBomExtractor;
+    private readonly BomImportService _bomImportService;
 
     public FramePartModel(
         FramePartService service,
         FrameDrawingService frameDrawingService,
         IWebHostEnvironment hostEnvironment,
         BomService bomService,
-        FrameBomExtractor frameBomExtractor)
+        FrameBomExtractor frameBomExtractor,
+        BomImportService bomImportService)
     {
         _service = service;
         _frameDrawingService = frameDrawingService;
         _hostEnvironment = hostEnvironment;
         _bomService = bomService;
         _frameBomExtractor = frameBomExtractor;
+        _bomImportService = bomImportService;
     }
 
     public FramePartViewModel? FramePart { get; private set; }
@@ -70,14 +73,33 @@ public class FramePartModel : PageModel
             return NotFound();
         }
 
-        if (BomUpload == null || BomUpload.Length == 0)
+        if (!framePart.HasDrawing || string.IsNullOrWhiteSpace(framePart.DrawingPath))
         {
-            ModelState.AddModelError(string.Empty, "Upload a BOM file first.");
+            ModelState.AddModelError(string.Empty, "Upload a drawing PDF first.");
             return await OnGetAsync(itemNo, ct);
         }
 
-        var extractedRows = await ParseUploadAsync(BomUpload, ct);
-        await _frameBomExtractor.MergeAsync(framePart.CurrentRevisionId, extractedRows, mergeDuplicateItemNos: true, ct);
+        var extractedRows = await _frameBomExtractor.ExtractFromDrawingAsync(framePart.DrawingPath, ct);
+        await _frameBomExtractor.MergeAsync(framePart.CurrentRevisionId, extractedRows, ct);
+
+        return RedirectToPage(new { itemNo });
+    }
+
+    public async Task<IActionResult> OnPostImportCsvAsync(string itemNo, CancellationToken ct)
+    {
+        var framePart = await _service.GetAsync(itemNo, ct);
+        if (framePart == null)
+        {
+            return NotFound();
+        }
+
+        if (BomUpload == null || BomUpload.Length == 0)
+        {
+            ModelState.AddModelError(string.Empty, "Upload a CSV BOM file first.");
+            return await OnGetAsync(itemNo, ct);
+        }
+
+        await _bomImportService.MergeCsvAsync(framePart.CurrentRevisionId, BomUpload, ct);
 
         return RedirectToPage(new { itemNo });
     }
@@ -140,6 +162,14 @@ public class FramePartModel : PageModel
         }
 
         await _frameDrawingService.UploadAsync(revisionId, DrawingUpload, ct);
+
+        var refreshed = await _service.GetAsync(itemNo, ct);
+        if (refreshed?.HasDrawing == true && !string.IsNullOrWhiteSpace(refreshed.DrawingPath))
+        {
+            var extractedRows = await _frameBomExtractor.ExtractFromDrawingAsync(refreshed.DrawingPath, ct);
+            await _frameBomExtractor.MergeAsync(refreshed.CurrentRevisionId, extractedRows, ct);
+        }
+
         return RedirectToPage(new { itemNo });
     }
 
@@ -173,55 +203,6 @@ public class FramePartModel : PageModel
 
         var normalized = drawingPath.Replace("\\", "/");
         return normalized.StartsWith('/') ? normalized : $"/{normalized}";
-    }
-
-    private async Task<List<ExtractedBomRow>> ParseUploadAsync(IFormFile file, CancellationToken ct)
-    {
-        var rows = new List<ExtractedBomRow>();
-
-        using var stream = file.OpenReadStream();
-        using var reader = new StreamReader(stream);
-
-        var lineNo = 0;
-        while (!reader.EndOfStream)
-        {
-            ct.ThrowIfCancellationRequested();
-            var line = await reader.ReadLineAsync(ct) ?? string.Empty;
-            lineNo++;
-
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                continue;
-            }
-
-            if (lineNo == 1 && line.Contains("item", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            var parts = line.Split(',', StringSplitOptions.TrimEntries);
-            if (parts.Length < 2)
-            {
-                continue;
-            }
-
-            var qty = 1m;
-            if (parts.Length >= 4 && !decimal.TryParse(parts[3], out qty))
-            {
-                qty = 1m;
-            }
-
-            rows.Add(new ExtractedBomRow
-            {
-                FindNo = parts[0],
-                ItemNo = parts[1],
-                Description = parts.Length >= 3 ? parts[2] : parts[1],
-                Qty = qty,
-                Notes = parts.Length >= 5 ? parts[4] : null
-            });
-        }
-
-        return rows;
     }
 
     private string? ResolveFilePath(string drawingPath)
