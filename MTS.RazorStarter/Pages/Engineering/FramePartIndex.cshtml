@@ -1,0 +1,62 @@
+@page "/Engineering/FramePart"
+@model MTS.RazorStarter.Pages.Engineering.FramePartIndexModel
+@{
+    ViewData["Title"] = "Frame Parts";
+}
+
+<section class="part-index-page">
+    <div class="part-index-header">
+        <h2>Frame Parts</h2>
+        <a class="part-btn part-btn-primary" href="/Engineering/FramePart/Create">Add Frame Part</a>
+    </div>
+
+    @if (Model.FrameParts.Count == 0)
+    {
+        <section class="part-index-empty">
+            <p>No frame parts yet</p>
+            <a class="part-btn part-btn-primary" href="/Engineering/FramePart/Create">Create First Frame Part</a>
+        </section>
+    }
+    else
+    {
+        <div class="part-index-table-wrap">
+            <table class="part-index-table">
+                <thead>
+                    <tr>
+                        <th>Item No</th>
+                        <th>Title</th>
+                        <th>Revision</th>
+                        <th>State</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var part in Model.FrameParts)
+                    {
+                        <tr>
+                            <td>@part.ItemNo</td>
+                            <td>@part.Title</td>
+                            <td>@(part.CurrentRevision ?? "-")</td>
+                            <td>@part.LifecycleState</td>
+                            <td>@part.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>
+                                <a class="part-btn" href="/Engineering/FramePart/@part.ItemNo">Open</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+<style>
+    .part-index-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .part-index-header h2 { margin: 0; }
+    .part-index-empty { border: 1px dashed #cbd5e1; border-radius: 10px; padding: 1rem; display: grid; gap: 0.75rem; justify-items: start; }
+    .part-index-table-wrap { overflow: auto; border: 1px solid #e2e8f0; border-radius: 10px; }
+    .part-index-table { width: 100%; border-collapse: collapse; }
+    .part-index-table th, .part-index-table td { text-align: left; padding: 0.65rem 0.5rem; border-bottom: 1px solid #e2e8f0; }
+    .part-index-table th { color: #64748b; font-size: 0.82rem; font-weight: 600; background: #f8fafc; }
+</style>

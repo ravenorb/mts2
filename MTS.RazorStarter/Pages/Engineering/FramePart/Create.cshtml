@@ -1,0 +1,46 @@
+@page "/Engineering/FramePart/Create"
+@model MTS.RazorStarter.Pages.Engineering.FramePart.CreateModel
+@{
+    ViewData["Title"] = "Create Frame Part";
+}
+
+<section class="part-create-page">
+    <form method="post" class="part-create-form">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <label>
+            ItemNo
+            <input asp-for="Input.ItemNo" />
+            <span asp-validation-for="Input.ItemNo" class="text-danger"></span>
+        </label>
+
+        <label>
+            Title
+            <input asp-for="Input.Title" />
+            <span asp-validation-for="Input.Title" class="text-danger"></span>
+        </label>
+
+        <label>
+            UnitOfMeasure
+            <input asp-for="Input.UnitOfMeasure" />
+            <span asp-validation-for="Input.UnitOfMeasure" class="text-danger"></span>
+        </label>
+
+        <div class="part-create-actions">
+            <button type="submit" class="part-btn part-btn-primary">Create Frame Part</button>
+            <a class="part-btn" href="/Engineering/FramePart">Cancel</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .part-create-form { max-width: 520px; display: grid; gap: 0.9rem; }
+    .part-create-form label { display: grid; gap: 0.35rem; font-weight: 500; }
+    .part-create-form input { border: 1px solid #cbd5e1; border-radius: 8px; padding: 0.5rem 0.6rem; }
+    .part-create-actions { display: flex; gap: 0.6rem; }
+    .text-danger { color: #dc2626; font-size: 0.85rem; }
+</style>

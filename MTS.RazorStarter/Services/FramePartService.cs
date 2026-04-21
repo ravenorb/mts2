@@ -14,6 +14,76 @@ public class FramePartService
         _db = db;
     }
 
+    public async Task<List<FramePartListItemVm>> GetAllAsync(CancellationToken ct = default)
+    {
+        return await _db.Items
+            .AsNoTracking()
+            .Where(i => i.ItemType == ItemType.FramePart)
+            .Select(i => new FramePartListItemVm
+            {
+                ItemNo = i.ItemNo,
+                Title = i.Title,
+                LifecycleState = i.LifecycleState.ToString(),
+                CurrentRevision = i.Revisions
+                    .Where(r => r.IsCurrent)
+                    .Select(r => r.RevisionCode)
+                    .FirstOrDefault(),
+                UpdatedAt = i.UpdatedAt
+            })
+            .OrderBy(i => i.ItemNo)
+            .ToListAsync(ct);
+    }
+
+    public async Task CreateAsync(CreateFramePartDto dto, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(dto.ItemNo))
+        {
+            throw new ArgumentException("Item No is required.", nameof(dto));
+        }
+
+        if (string.IsNullOrWhiteSpace(dto.Title))
+        {
+            throw new ArgumentException("Title is required.", nameof(dto));
+        }
+
+        var normalizedItemNo = dto.ItemNo.Trim();
+        var normalizedTitle = dto.Title.Trim();
+        var normalizedUom = string.IsNullOrWhiteSpace(dto.UnitOfMeasure) ? "EA" : dto.UnitOfMeasure.Trim().ToUpperInvariant();
+
+        var exists = await _db.Items.AnyAsync(x => x.ItemNo == normalizedItemNo, ct);
+        if (exists)
+        {
+            throw new InvalidOperationException($"Item '{normalizedItemNo}' already exists.");
+        }
+
+        var now = DateTime.UtcNow;
+
+        var item = new Item
+        {
+            ItemNo = normalizedItemNo,
+            ItemType = ItemType.FramePart,
+            Title = normalizedTitle,
+            UnitOfMeasure = normalizedUom,
+            LifecycleState = LifecycleState.Active,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+
+        _db.Items.Add(item);
+        await _db.SaveChangesAsync(ct);
+
+        _db.ItemRevisions.Add(new ItemRevision
+        {
+            ItemId = item.Id,
+            RevisionCode = "A",
+            IsCurrent = true,
+            ReleaseState = ReleaseState.Draft,
+            CreatedAt = now
+        });
+
+        await _db.SaveChangesAsync(ct);
+    }
+
     public async Task<FramePartViewModel?> GetAsync(string itemNo, CancellationToken ct = default)
     {
         var item = await _db.Items
@@ -49,6 +119,7 @@ public class FramePartService
             {
                 ItemNo = item.ItemNo,
                 Title = item.Title,
+                LifecycleState = item.LifecycleState.ToString(),
                 CreatedAt = item.CreatedAt,
                 UpdatedAt = item.UpdatedAt
             };
@@ -67,6 +138,7 @@ public class FramePartService
         {
             ItemNo = item.ItemNo,
             Title = item.Title,
+            LifecycleState = item.LifecycleState.ToString(),
             CreatedAt = item.CreatedAt,
             UpdatedAt = item.UpdatedAt,
             CurrentRevisionId = currentRevision.Id,

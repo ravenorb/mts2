@@ -8,6 +8,7 @@ public class FramePartViewModel
     public string Title { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public string LifecycleState { get; set; } = string.Empty;
 
     public int CurrentRevisionId { get; set; }
     public string CurrentRevisionCode { get; set; } = "N/A";
