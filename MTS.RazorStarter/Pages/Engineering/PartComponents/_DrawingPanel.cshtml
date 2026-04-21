@@ -1,0 +1,17 @@
+@model MTS.RazorStarter.Pages.Engineering.FramePartModel.PartDetailViewModel
+
+<section>
+    <h3 class="panel-title">Drawing Viewer</h3>
+
+    @if (Model.HasDrawing && !string.IsNullOrWhiteSpace(Model.DrawingPath))
+    {
+        <iframe class="drawing-frame" src="@Model.DrawingPath" title="Primary drawing"></iframe>
+        <div style="margin-top:0.8rem;">
+            <a class="part-btn" href="@Model.DrawingPath" target="_blank" rel="noopener noreferrer">Open Full Drawing</a>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">No drawing uploaded.</div>
+    }
+</section>

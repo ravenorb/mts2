@@ -1,0 +1,19 @@
+@model MTS.RazorStarter.Pages.Engineering.FramePartModel.PartDetailViewModel
+@{
+    var isReleased = string.Equals(Model.Status, "Released", StringComparison.OrdinalIgnoreCase);
+}
+
+<header class="part-card part-header">
+    <div>
+        <h1 class="part-id">@Model.ItemNo</h1>
+        <p class="part-title">@Model.Title</p>
+        <div class="part-meta-line">
+            <span class="badge badge-revision">Revision @Model.CurrentRevision</span>
+            <span class="badge @(isReleased ? "badge-status-released" : "badge-status-draft")">@Model.Status</span>
+        </div>
+    </div>
+    <div class="part-action-row">
+        <a class="part-btn" href="#">Upload Drawing</a>
+        <a class="part-btn part-btn-primary" href="#">Upload Cut Sheet</a>
+    </div>
+</header>

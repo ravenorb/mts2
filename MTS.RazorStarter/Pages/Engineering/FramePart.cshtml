@@ -1,46 +1,106 @@
-@page "{id}"
+@page "{itemNo}"
 @model MTS.RazorStarter.Pages.Engineering.FramePartModel
+@{
+    ViewData["Title"] = $"Frame Part {Model.PartDetail?.ItemNo}";
+}
 
-<h2>Frame Part</h2>
-
-@if (Model.Part == null)
+@if (Model.PartDetail == null)
 {
-    <p>Not found</p>
+    <section class="part-empty-state">
+        <h2>Part not found</h2>
+        <p>The requested frame part is unavailable.</p>
+    </section>
 }
 else
 {
-    <h3>@Model.Part.ItemNo - @Model.Part.Title</h3>
+    <section class="part-detail-page">
+        <partial name="PartComponents/_PartHeader" model="Model.PartDetail" />
 
-    @foreach (var rev in Model.Part.Revisions)
-    {
-        <div style="border:1px solid #ccc; padding:10px; margin-bottom:15px;">
-            
-            <h4>Revision @rev.RevisionCode</h4>
-
-            <div>
-                <strong>Drawing:</strong><br />
-                @if (!string.IsNullOrEmpty(rev.DrawingPath))
-                {
-                    <a href="@rev.DrawingPath" target="_blank">View Drawing</a>
-                }
-                else
-                {
-                    <span>No drawing</span>
-                }
+        <div class="part-detail-grid">
+            <div class="part-main-column">
+                <partial name="PartComponents/_PartTabs" model="Model.PartDetail" />
             </div>
-
-            <div style="margin-top:10px;">
-                <strong>Cut Sheets:</strong>
-                <ul>
-                    @foreach (var cs in rev.CutSheets)
-                    {
-                        <li>
-                            <a href="@cs.FilePath" target="_blank">@cs.FileName</a>
-                        </li>
-                    }
-                </ul>
-            </div>
-
+            <aside class="part-sidebar-column">
+                <partial name="PartComponents/_SidebarPanel" model="Model.PartDetail" />
+            </aside>
         </div>
-    }
+    </section>
 }
+
+<style>
+    .part-detail-page { display: grid; gap: 1rem; color: #0f172a; }
+    .part-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05); }
+    .part-header { padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
+    .part-id { margin: 0; font-size: 1.9rem; font-weight: 700; letter-spacing: -0.02em; }
+    .part-title { margin: 0.3rem 0 0; color: #475569; font-size: 1rem; }
+    .part-meta-line { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.7rem; }
+    .badge { border-radius: 999px; padding: 0.2rem 0.65rem; font-size: 0.78rem; font-weight: 600; }
+    .badge-revision { background: #e0f2fe; color: #0c4a6e; }
+    .badge-status-released { background: #dcfce7; color: #166534; }
+    .badge-status-draft { background: #fef3c7; color: #92400e; }
+    .part-action-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .part-btn { border: 1px solid #cbd5e1; background: #fff; color: #0f172a; border-radius: 9px; padding: 0.48rem 0.9rem; font-size: 0.9rem; font-weight: 500; text-decoration: none; cursor: pointer; }
+    .part-btn-primary { background: #0f172a; color: #fff; border-color: #0f172a; }
+
+    .part-detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 1rem; }
+    .part-main-column, .part-sidebar-column { min-width: 0; }
+
+    .part-tabs-nav { display: flex; gap: 0.25rem; border-bottom: 1px solid #e2e8f0; padding: 0.6rem 0.8rem; overflow-x: auto; }
+    .part-tab-trigger { border: 0; background: transparent; border-radius: 8px; padding: 0.48rem 0.8rem; color: #475569; font-weight: 500; cursor: pointer; }
+    .part-tab-trigger.active { background: #e2e8f0; color: #0f172a; }
+    .part-tab-content { padding: 1rem; display: none; }
+    .part-tab-content.active { display: block; }
+
+    .panel-title { margin: 0 0 0.75rem; font-size: 1rem; font-weight: 600; }
+    .overview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
+    .overview-item { border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.7rem; background: #f8fafc; }
+    .overview-label { color: #64748b; font-size: 0.78rem; }
+    .overview-value { font-weight: 600; margin-top: 0.2rem; }
+
+    .drawing-frame { width: 100%; min-height: 560px; border: 1px solid #cbd5e1; border-radius: 10px; }
+    .empty-state { border: 1px dashed #cbd5e1; border-radius: 10px; padding: 1rem; color: #64748b; }
+
+    .cutsheet-table { width: 100%; border-collapse: collapse; }
+    .cutsheet-table th, .cutsheet-table td { text-align: left; padding: 0.65rem 0.5rem; border-bottom: 1px solid #e2e8f0; }
+    .cutsheet-table th { color: #64748b; font-size: 0.82rem; font-weight: 600; }
+    .cutsheet-link { color: #0f172a; font-weight: 500; text-decoration: none; }
+
+    .sidebar-stack { display: grid; gap: 1rem; }
+    .sidebar-card { padding: 1rem; }
+    .meta-list { display: grid; gap: 0.8rem; margin: 0; }
+    .meta-row dt { color: #64748b; font-size: 0.8rem; }
+    .meta-row dd { margin: 0.2rem 0 0; font-weight: 600; }
+    .quick-actions { display: grid; gap: 0.6rem; }
+
+    @@media (max-width: 1080px) {
+        .part-detail-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<script>
+    (() => {
+        const root = document.querySelector('[data-part-tabs]');
+        if (!root) return;
+
+        const triggers = Array.from(root.querySelectorAll('[data-tab-target]'));
+        const panes = Array.from(root.querySelectorAll('[data-tab-pane]'));
+
+        const activate = (tabName) => {
+            triggers.forEach((trigger) => {
+                const isActive = trigger.dataset.tabTarget === tabName;
+                trigger.classList.toggle('active', isActive);
+                trigger.setAttribute('aria-selected', isActive.toString());
+            });
+
+            panes.forEach((pane) => {
+                pane.classList.toggle('active', pane.dataset.tabPane === tabName);
+            });
+        };
+
+        triggers.forEach((trigger) => {
+            trigger.addEventListener('click', () => activate(trigger.dataset.tabTarget));
+        });
+
+        activate('overview');
+    })();
+</script>
