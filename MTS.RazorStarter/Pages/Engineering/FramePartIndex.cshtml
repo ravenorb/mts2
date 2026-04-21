@@ -10,10 +10,22 @@
         <a class="part-btn part-btn-primary" href="/Engineering/FramePart/Create">Add Frame Part</a>
     </div>
 
+    <form class="part-index-filters" method="get">
+        <input type="text" name="search" placeholder="Search item no or title..." value="@Model.Search" />
+        <select name="state">
+            <option value="">All States</option>
+            <option value="Active" selected="@(Model.State == "Active" ? "selected" : null)">Active</option>
+            <option value="Inactive" selected="@(Model.State == "Inactive" ? "selected" : null)">Inactive</option>
+        </select>
+        <input type="hidden" name="sort" value="@Model.Sort" />
+        <input type="hidden" name="dir" value="@Model.Dir" />
+        <button class="part-btn part-btn-primary" type="submit">Filter</button>
+    </form>
+
     @if (Model.FrameParts.Count == 0)
     {
         <section class="part-index-empty">
-            <p>No frame parts yet</p>
+            <p>No frame parts found</p>
             <a class="part-btn part-btn-primary" href="/Engineering/FramePart/Create">Create First Frame Part</a>
         </section>
     }
@@ -23,11 +35,32 @@
             <table class="part-index-table">
                 <thead>
                     <tr>
-                        <th>Item No</th>
-                        <th>Title</th>
+                        <th>
+                            <a asp-page="/Engineering/FramePartIndex"
+                               asp-route-search="@Model.Search"
+                               asp-route-state="@Model.State"
+                               asp-route-sort="ItemNo"
+                               asp-route-dir="@Model.ToggleDir("ItemNo")"
+                               asp-route-page="1">Item No</a>
+                        </th>
+                        <th>
+                            <a asp-page="/Engineering/FramePartIndex"
+                               asp-route-search="@Model.Search"
+                               asp-route-state="@Model.State"
+                               asp-route-sort="Title"
+                               asp-route-dir="@Model.ToggleDir("Title")"
+                               asp-route-page="1">Title</a>
+                        </th>
                         <th>Revision</th>
                         <th>State</th>
-                        <th>Updated</th>
+                        <th>
+                            <a asp-page="/Engineering/FramePartIndex"
+                               asp-route-search="@Model.Search"
+                               asp-route-state="@Model.State"
+                               asp-route-sort="Updated"
+                               asp-route-dir="@Model.ToggleDir("Updated")"
+                               asp-route-page="1">Updated</a>
+                        </th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -48,15 +81,47 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="part-index-pagination">
+            <span>Page @Model.Page of @Model.TotalPages (@Model.TotalCount total)</span>
+            <div class="part-index-pagination-links">
+                @if (Model.HasPreviousPage)
+                {
+                    <a class="part-btn"
+                       asp-page="/Engineering/FramePartIndex"
+                       asp-route-search="@Model.Search"
+                       asp-route-state="@Model.State"
+                       asp-route-sort="@Model.Sort"
+                       asp-route-dir="@Model.Dir"
+                       asp-route-page="@(Model.Page - 1)">Previous</a>
+                }
+                @if (Model.HasNextPage)
+                {
+                    <a class="part-btn"
+                       asp-page="/Engineering/FramePartIndex"
+                       asp-route-search="@Model.Search"
+                       asp-route-state="@Model.State"
+                       asp-route-sort="@Model.Sort"
+                       asp-route-dir="@Model.Dir"
+                       asp-route-page="@(Model.Page + 1)">Next</a>
+                }
+            </div>
+        </div>
     }
 </section>
 
 <style>
     .part-index-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
     .part-index-header h2 { margin: 0; }
+    .part-index-filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .part-index-filters input, .part-index-filters select { min-height: 2.25rem; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; }
     .part-index-empty { border: 1px dashed #cbd5e1; border-radius: 10px; padding: 1rem; display: grid; gap: 0.75rem; justify-items: start; }
     .part-index-table-wrap { overflow: auto; border: 1px solid #e2e8f0; border-radius: 10px; }
     .part-index-table { width: 100%; border-collapse: collapse; }
     .part-index-table th, .part-index-table td { text-align: left; padding: 0.65rem 0.5rem; border-bottom: 1px solid #e2e8f0; }
     .part-index-table th { color: #64748b; font-size: 0.82rem; font-weight: 600; background: #f8fafc; }
+    .part-index-table th a { color: inherit; text-decoration: none; }
+    .part-index-table th a:hover { text-decoration: underline; }
+    .part-index-pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; }
+    .part-index-pagination-links { display: flex; gap: 0.5rem; }
 </style>
