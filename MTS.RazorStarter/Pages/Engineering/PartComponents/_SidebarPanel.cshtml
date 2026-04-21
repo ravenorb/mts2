@@ -1,0 +1,29 @@
+@model MTS.RazorStarter.Pages.Engineering.FramePartModel.PartDetailViewModel
+
+<div class="sidebar-stack">
+    <section class="part-card sidebar-card">
+        <h3 class="panel-title">Metadata</h3>
+        <dl class="meta-list">
+            <div class="meta-row">
+                <dt>Created date</dt>
+                <dd>@Model.CreatedDate.ToString("yyyy-MM-dd")</dd>
+            </div>
+            <div class="meta-row">
+                <dt>Last updated</dt>
+                <dd>@Model.LastUpdated.ToString("yyyy-MM-dd")</dd>
+            </div>
+            <div class="meta-row">
+                <dt>Revision count</dt>
+                <dd>@Model.Revisions.Count</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="part-card sidebar-card">
+        <h3 class="panel-title">Quick Actions</h3>
+        <div class="quick-actions">
+            <a class="part-btn" href="#">Upload File</a>
+            <a class="part-btn part-btn-primary" href="#">Create Revision</a>
+        </div>
+    </section>
+</div>

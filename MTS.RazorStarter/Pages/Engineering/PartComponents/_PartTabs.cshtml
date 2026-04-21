@@ -1,0 +1,53 @@
+@model MTS.RazorStarter.Pages.Engineering.FramePartModel.PartDetailViewModel
+
+<section class="part-card" data-part-tabs>
+    <nav class="part-tabs-nav" aria-label="Part detail tabs">
+        <button type="button" class="part-tab-trigger" data-tab-target="overview" aria-selected="false">Overview</button>
+        <button type="button" class="part-tab-trigger" data-tab-target="drawings" aria-selected="false">Drawings</button>
+        <button type="button" class="part-tab-trigger" data-tab-target="cutsheets" aria-selected="false">Cut Sheets</button>
+        <button type="button" class="part-tab-trigger" data-tab-target="bom" aria-selected="false">BOM</button>
+        <button type="button" class="part-tab-trigger" data-tab-target="activity" aria-selected="false">Activity</button>
+    </nav>
+
+    <div class="part-tab-content" data-tab-pane="overview">
+        <h3 class="panel-title">Part Summary</h3>
+        <div class="overview-grid">
+            <div class="overview-item">
+                <div class="overview-label">Item Number</div>
+                <div class="overview-value">@Model.ItemNo</div>
+            </div>
+            <div class="overview-item">
+                <div class="overview-label">Title</div>
+                <div class="overview-value">@Model.Title</div>
+            </div>
+            <div class="overview-item">
+                <div class="overview-label">Revisions</div>
+                <div class="overview-value">@string.Join(", ", Model.Revisions)</div>
+            </div>
+            <div class="overview-item">
+                <div class="overview-label">Cut Sheet Count</div>
+                <div class="overview-value">@Model.CutSheets.Count</div>
+            </div>
+            <div class="overview-item">
+                <div class="overview-label">Has Drawing</div>
+                <div class="overview-value">@(Model.HasDrawing ? "Yes" : "No")</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="part-tab-content" data-tab-pane="drawings">
+        <partial name="PartComponents/_DrawingPanel" model="Model" />
+    </div>
+
+    <div class="part-tab-content" data-tab-pane="cutsheets">
+        <partial name="PartComponents/_CutSheetTable" model="Model.CutSheets" />
+    </div>
+
+    <div class="part-tab-content" data-tab-pane="bom">
+        <div class="empty-state">BOM panel coming soon.</div>
+    </div>
+
+    <div class="part-tab-content" data-tab-pane="activity">
+        <div class="empty-state">Activity feed coming soon.</div>
+    </div>
+</section>

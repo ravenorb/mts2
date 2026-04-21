@@ -26,32 +26,42 @@ public class FramePartService
                         .ThenInclude(r => r.Item)
             .FirstOrDefaultAsync(x => x.ItemNo == itemNo, ct);
 
-        if (item == null) return null;
+        if (item == null)
+        {
+            return null;
+        }
 
         return new FramePartViewModel
         {
             ItemNo = item.ItemNo,
             Title = item.Title,
-
-            Revisions = item.Revisions.Select(r => new FramePartViewModel.RevisionVM
-            {
-                RevisionCode = r.RevisionCode,
-
-                // DRAWING (from document links)
-                DrawingPath = r.DocumentLinks
-                    .Where(l => l.DocumentRole.ToString() == "Drawing")
-                    .Select(l => l.DocumentRevision.FilePath)
-                    .FirstOrDefault(),
-
-                // CUT SHEETS (from link table)
-                CutSheets = r.FramePartCutSheetLinksAsFramePart
-                    .Select(l => new FramePartViewModel.CutSheetVM
-                    {
-                        FileName = l.CutSheetRevision.Item.ItemNo,
-                        FilePath = "" // add file path later if you store it
-                    }).ToList()
-
-            }).ToList()
+            CreatedAt = item.CreatedAt,
+            UpdatedAt = item.UpdatedAt,
+            Revisions = item.Revisions
+                .OrderByDescending(r => r.IsCurrent)
+                .ThenByDescending(r => r.CreatedAt)
+                .Select(r => new FramePartViewModel.RevisionVM
+                {
+                    RevisionCode = r.RevisionCode,
+                    IsCurrent = r.IsCurrent,
+                    ReleaseState = r.ReleaseState.ToString(),
+                    CreatedAt = r.CreatedAt,
+                    DrawingPath = r.DocumentLinks
+                        .Where(l => l.DocumentRole.ToString().Contains("Drawing"))
+                        .OrderByDescending(l => l.IsPrimary)
+                        .ThenBy(l => l.SortOrder)
+                        .Select(l => l.DocumentRevision.FilePath)
+                        .FirstOrDefault(),
+                    CutSheets = r.FramePartCutSheetLinksAsFramePart
+                        .Select(l => new FramePartViewModel.CutSheetVM
+                        {
+                            FileName = l.CutSheetRevision.Item.ItemNo,
+                            FilePath = string.Empty,
+                            Type = "Laser"
+                        })
+                        .ToList()
+                })
+                .ToList()
         };
     }
 }
