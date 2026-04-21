@@ -31,6 +31,7 @@ public class CutSheetVm
 
 public class BomRowVm
 {
+    public int Id { get; set; }
     public int ParentRevisionId { get; set; }
     public int ChildRevisionId { get; set; }
     public string? FindNo { get; set; }
@@ -40,6 +41,7 @@ public class BomRowVm
     public decimal Qty { get; set; }
     public string BomRole { get; set; } = string.Empty;
     public string? Notes { get; set; }
+    public string SourceType { get; set; } = "Manual";
     public bool HasChildren { get; set; }
     public List<BomRowVm> Children { get; set; } = new();
 }
