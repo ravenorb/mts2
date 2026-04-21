@@ -9,6 +9,7 @@ public class NavigationService
         new() { Title = "Home", Url = "/", Section = "General" },
         new() { Title = "Stations", Url = "/Stations", Section = "Production" },
         new() { Title = "Engineering", Url = "/Engineering", Section = "Engineering" },
+        new() { Title = "Frame Parts", Url = "/Engineering/FramePart", Section = "Engineering" },
         new() { Title = "Maintenance", Url = "/Maintenance", Section = "Maintenance" },
         new() { Title = "Planning", Url = "/Planning", Section = "Planning" }
     ];
