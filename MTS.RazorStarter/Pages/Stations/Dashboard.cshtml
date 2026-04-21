@@ -1,22 +1,50 @@
 @page
 @model MTS.RazorStarter.Pages.Stations.DashboardModel
+@{
+    ViewData["Title"] = "Monitoring Dashboard";
+}
 
-<h2>Items</h2>
+<section class="monitoring-page">
+    <div class="part-card mts-panel">
+        <h2>Machine Monitoring</h2>
+        <p class="topbar-note">Live view of tracked frame items across stations.</p>
+    </div>
 
-<table>
-    <thead>
-        <tr>
-            <th>Item No</th>
-            <th>Title</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model.Dashboard.Items)
+    @if (Model.Dashboard.Items.Count == 0)
     {
-        <tr>
-            <td>@item.ItemNo</td>
-            <td>@item.Title</td>
-        </tr>
+        <div class="part-card mts-panel empty-state">
+            <p>No machines available for monitoring.</p>
+        </div>
     }
-    </tbody>
-</table>
+    else
+    {
+        <div class="machine-grid">
+            @for (var i = 0; i < Model.Dashboard.Items.Count; i++)
+            {
+                var item = Model.Dashboard.Items[i];
+                var normalized = $"{item.ItemNo} {item.Title}".ToLowerInvariant();
+                var statusClass = "mts-badge-success";
+                var statusLabel = "Running";
+
+                if (normalized.Contains("hold") || normalized.Contains("down") || normalized.Contains("error"))
+                {
+                    statusClass = "mts-badge-danger";
+                    statusLabel = "Stopped";
+                }
+                else if (normalized.Contains("idle") || normalized.Contains("queue") || normalized.Contains("wait"))
+                {
+                    statusClass = "mts-badge-warning";
+                    statusLabel = "Idle";
+                }
+
+                <article class="part-card machine-card">
+                    <div class="machine-head">
+                        <h3 class="machine-id">@item.ItemNo</h3>
+                        <span class="mts-badge @statusClass">@statusLabel</span>
+                    </div>
+                    <p class="machine-title">@item.Title</p>
+                </article>
+            }
+        </div>
+    }
+</section>
