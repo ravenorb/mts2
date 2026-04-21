@@ -7,18 +7,22 @@ namespace MTS.RazorStarter.Pages.Engineering;
 
 public class FramePartModel : PageModel
 {
+    private const long MaxDrawingFileSizeBytes = 20 * 1024 * 1024;
     private readonly FramePartService _service;
+    private readonly FrameDrawingService _frameDrawingService;
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly BomService _bomService;
     private readonly FrameBomExtractor _frameBomExtractor;
 
     public FramePartModel(
         FramePartService service,
+        FrameDrawingService frameDrawingService,
         IWebHostEnvironment hostEnvironment,
         BomService bomService,
         FrameBomExtractor frameBomExtractor)
     {
         _service = service;
+        _frameDrawingService = frameDrawingService;
         _hostEnvironment = hostEnvironment;
         _bomService = bomService;
         _frameBomExtractor = frameBomExtractor;
@@ -28,6 +32,12 @@ public class FramePartModel : PageModel
 
     [BindProperty]
     public IFormFile? BomUpload { get; set; }
+
+    [BindProperty]
+    public IFormFile? DrawingUpload { get; set; }
+
+    [BindProperty]
+    public string? DrawingRevisionCode { get; set; }
 
     [BindProperty]
     public BomEditDto EditRow { get; set; } = new();
@@ -40,9 +50,9 @@ public class FramePartModel : PageModel
             return NotFound();
         }
 
-        if (framePart.HasPrimaryDrawing && !string.IsNullOrWhiteSpace(framePart.PrimaryDrawingPath))
+        if (framePart.HasDrawing && !string.IsNullOrWhiteSpace(framePart.DrawingPath))
         {
-            var openUrl = BuildOpenDrawingUrl(framePart.PrimaryDrawingPath);
+            var openUrl = BuildOpenDrawingUrl(framePart.DrawingPath);
             framePart.DrawingOpenUrl = openUrl;
             framePart.DrawingDownloadUrl = Url.Page("/Engineering/FramePart", "DrawingDownload", new { itemNo });
         }
@@ -89,23 +99,67 @@ public class FramePartModel : PageModel
         return RedirectToPage(new { itemNo });
     }
 
-    public async Task<IActionResult> OnGetDrawingDownloadAsync(string itemNo, CancellationToken ct)
+    public async Task<IActionResult> OnPostUploadDrawingAsync(string itemNo, CancellationToken ct)
     {
+        if (DrawingUpload == null || DrawingUpload.Length == 0)
+        {
+            ModelState.AddModelError(string.Empty, "Upload a drawing PDF first.");
+            return await OnGetAsync(itemNo, ct);
+        }
+
+        if (!string.Equals(Path.GetExtension(DrawingUpload.FileName), ".pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            ModelState.AddModelError(string.Empty, "Only PDF files are supported.");
+            return await OnGetAsync(itemNo, ct);
+        }
+
+        if (DrawingUpload.Length > MaxDrawingFileSizeBytes)
+        {
+            ModelState.AddModelError(string.Empty, "Drawing exceeds 20MB limit.");
+            return await OnGetAsync(itemNo, ct);
+        }
+
         var framePart = await _service.GetAsync(itemNo, ct);
-        if (framePart == null || !framePart.HasPrimaryDrawing || string.IsNullOrWhiteSpace(framePart.PrimaryDrawingPath))
+        if (framePart == null)
         {
             return NotFound();
         }
 
-        var filePath = ResolveFilePath(framePart.PrimaryDrawingPath);
+        var revisionId = framePart.CurrentRevisionId;
+        if (!string.IsNullOrWhiteSpace(DrawingRevisionCode) &&
+            !string.Equals(DrawingRevisionCode, framePart.CurrentRevisionCode, StringComparison.OrdinalIgnoreCase))
+        {
+            var targetRevision = await _service.GetRevisionAsync(itemNo, DrawingRevisionCode, ct);
+            if (targetRevision == null)
+            {
+                ModelState.AddModelError(string.Empty, $"Revision '{DrawingRevisionCode}' was not found for item '{itemNo}'.");
+                return await OnGetAsync(itemNo, ct);
+            }
+
+            revisionId = targetRevision.Id;
+        }
+
+        await _frameDrawingService.UploadAsync(revisionId, DrawingUpload, ct);
+        return RedirectToPage(new { itemNo });
+    }
+
+    public async Task<IActionResult> OnGetDrawingDownloadAsync(string itemNo, CancellationToken ct)
+    {
+        var framePart = await _service.GetAsync(itemNo, ct);
+        if (framePart == null || !framePart.HasDrawing || string.IsNullOrWhiteSpace(framePart.DrawingPath))
+        {
+            return NotFound();
+        }
+
+        var filePath = ResolveFilePath(framePart.DrawingPath);
         if (filePath == null || !System.IO.File.Exists(filePath))
         {
             return NotFound();
         }
 
-        var fileName = string.IsNullOrWhiteSpace(framePart.PrimaryDrawingFileName)
+        var fileName = string.IsNullOrWhiteSpace(framePart.DrawingFileName)
             ? Path.GetFileName(filePath)
-            : framePart.PrimaryDrawingFileName;
+            : framePart.DrawingFileName;
 
         return PhysicalFile(filePath, "application/pdf", fileName);
     }
