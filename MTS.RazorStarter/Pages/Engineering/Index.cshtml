@@ -1,0 +1,18 @@
+@page "/Engineering"
+@model MTS.RazorStarter.Pages.Engineering.IndexModel
+@{
+    ViewData["Title"] = "Engineering";
+}
+
+<div class="grid grid-2">
+    <div class="card">
+        <h2>Frame parts</h2>
+        <p>Start here for frame drawings, cut-sheet links, parsed BOM review, and component-part resolution.</p>
+        <p class="muted">Suggested next page: /Engineering/FrameParts/{id}</p>
+    </div>
+    <div class="card">
+        <h2>Machine presets</h2>
+        <p>Good Razor candidate: weld presets, weave visualization, speeddata/zonedata editors, and CDB file management.</p>
+        <p class="muted">Keep heavy parsing services outside the page model.</p>
+    </div>
+</div>

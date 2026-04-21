@@ -1,0 +1,28 @@
+@page
+@model IndexModel
+
+<h2>Items</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Item No</th>
+            <th>Title</th>
+            <th>Revisions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Dashboard.Items)
+    {
+        <tr>
+            <td>@item.ItemNo</td>
+            <td>@item.Title</td>
+            <td>
+                @string.Join(", ", item.Revisions)
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+    </div>
+</div>

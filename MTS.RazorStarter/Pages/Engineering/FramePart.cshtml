@@ -1,0 +1,46 @@
+@page "{id}"
+@model MTS.RazorStarter.Pages.Engineering.FramePartModel
+
+<h2>Frame Part</h2>
+
+@if (Model.Part == null)
+{
+    <p>Not found</p>
+}
+else
+{
+    <h3>@Model.Part.ItemNo - @Model.Part.Title</h3>
+
+    @foreach (var rev in Model.Part.Revisions)
+    {
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:15px;">
+            
+            <h4>Revision @rev.RevisionCode</h4>
+
+            <div>
+                <strong>Drawing:</strong><br />
+                @if (!string.IsNullOrEmpty(rev.DrawingPath))
+                {
+                    <a href="@rev.DrawingPath" target="_blank">View Drawing</a>
+                }
+                else
+                {
+                    <span>No drawing</span>
+                }
+            </div>
+
+            <div style="margin-top:10px;">
+                <strong>Cut Sheets:</strong>
+                <ul>
+                    @foreach (var cs in rev.CutSheets)
+                    {
+                        <li>
+                            <a href="@cs.FilePath" target="_blank">@cs.FileName</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+        </div>
+    }
+}

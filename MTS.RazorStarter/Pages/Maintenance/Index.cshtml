@@ -1,0 +1,30 @@
+@page "/Maintenance"
+@model MTS.RazorStarter.Pages.Maintenance.IndexModel
+@{
+    ViewData["Title"] = "Maintenance";
+}
+
+<div class="card">
+    <h2>Scheduled maintenance</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Task</th>
+                <th>Responsible</th>
+                <th>Frequency</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var task in Model.Tasks)
+        {
+            <tr>
+                <td>@task.Title</td>
+                <td>@task.ResponsibleParty</td>
+                <td>@task.Frequency</td>
+                <td>@task.Status</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

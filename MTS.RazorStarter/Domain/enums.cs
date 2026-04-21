@@ -1,0 +1,67 @@
+namespace Mts.Domain;
+
+public enum ItemType
+{
+    FramePart = 1,
+    FrameAssembly = 2,
+    CutSheet = 3,
+    ComponentPart = 4,
+    PurchasedPart = 5
+}
+
+public enum LifecycleState
+{
+    Draft = 1,
+    Active = 2,
+    Obsolete = 3
+}
+
+public enum ReleaseState
+{
+    Draft = 1,
+    Released = 2,
+    Superseded = 3
+}
+
+public enum MakeBuyType
+{
+    Make = 1,
+    Buy = 2
+}
+
+public enum DocumentType
+{
+    Drawing = 1,
+    CutSheetPdf = 2,
+    BendSheet = 3,
+    Traveler = 4,
+    WorkInstruction = 5,
+    MachineFile = 6
+}
+
+public enum DocumentRole
+{
+    FramePartDrawing = 1,
+    FrameAssemblyDrawing = 2,
+    CutSheetPdf = 3,
+    CutSheetDrawing = 4,
+    BendSheet = 5,
+    Traveler = 6,
+    WorkInstruction = 7,
+    MachineFile = 8
+}
+
+public enum BomRole
+{
+    Component = 1,
+    Subassembly = 2,
+    Hardware = 3,
+    Consumable = 4
+}
+
+public enum CutSheetLinkType
+{
+    ManufacturedFrom = 1,
+    AlternateSource = 2,
+    NestsOn = 3
+}

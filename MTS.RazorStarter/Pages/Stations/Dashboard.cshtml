@@ -1,0 +1,22 @@
+@page
+@model MTS.RazorStarter.Pages.Stations.DashboardModel
+
+<h2>Items</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Item No</th>
+            <th>Title</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Dashboard.Items)
+    {
+        <tr>
+            <td>@item.ItemNo</td>
+            <td>@item.Title</td>
+        </tr>
+    }
+    </tbody>
+</table>

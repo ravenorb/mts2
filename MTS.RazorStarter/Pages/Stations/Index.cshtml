@@ -1,0 +1,35 @@
+@page
+@model MTS.RazorStarter.Pages.Stations.IndexModel
+
+<h2>Move Pallet</h2>
+
+<form method="post">
+    <div>
+        <label>Station ID</label>
+        <input asp-for="MoveRequest.StationId" />
+    </div>
+
+    <div>
+        <label>Pallet ID</label>
+        <input asp-for="MoveRequest.PalletId" />
+    </div>
+
+    <div>
+        <label>Destination</label>
+        <input asp-for="MoveRequest.ToRoute" />
+    </div>
+
+    <div>
+        <label>Notes</label>
+        <input asp-for="MoveRequest.Notes" />
+    </div>
+
+    <button type="submit">Move</button>
+</form>
+
+@if (Model.ResultMessage != null)
+{
+    <div style="margin-top:20px;">
+        <strong>@Model.ResultMessage</strong>
+    </div>
+}
