@@ -15,6 +15,9 @@ public class FramePartViewModel
     public string? PrimaryDrawingFileName { get; set; }
     public string? PrimaryDrawingPath { get; set; }
     public bool HasPrimaryDrawing { get; set; }
+    public string? DrawingPath { get; set; }
+    public string? DrawingFileName { get; set; }
+    public bool HasDrawing { get; set; }
     public string? DrawingDownloadUrl { get; set; }
     public string? DrawingOpenUrl { get; set; }
 

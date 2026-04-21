@@ -76,6 +76,9 @@ public class FramePartService
             PrimaryDrawingFileName = primaryDrawing?.FileName,
             PrimaryDrawingPath = primaryDrawing?.FilePath,
             HasPrimaryDrawing = !string.IsNullOrWhiteSpace(primaryDrawing?.FilePath),
+            DrawingFileName = primaryDrawing?.FileName,
+            DrawingPath = primaryDrawing?.FilePath,
+            HasDrawing = !string.IsNullOrWhiteSpace(primaryDrawing?.FilePath),
             CutSheets = currentRevision.FramePartCutSheetLinksAsFramePart
                 .OrderByDescending(l => l.IsPrimary)
                 .Select(l => new CutSheetVm
@@ -87,6 +90,16 @@ public class FramePartService
                 .ToList(),
             BomRows = bomRows
         };
+    }
+
+    public Task<ItemRevision?> GetRevisionAsync(string itemNo, string revisionCode, CancellationToken ct = default)
+    {
+        return _db.ItemRevisions
+            .AsNoTracking()
+            .Include(r => r.Item)
+            .FirstOrDefaultAsync(
+                r => r.Item.ItemNo == itemNo && r.RevisionCode == revisionCode,
+                ct);
     }
 
     private async Task<List<BomRowVm>> LoadBomTreeAsync(int rootRevisionId, int maxDepth, CancellationToken ct)

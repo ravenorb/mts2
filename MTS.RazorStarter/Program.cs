@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Services
 builder.Services.AddScoped<FramePartService>();
+builder.Services.AddScoped<FrameDrawingService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<StationDashboardService>();
 builder.Services.AddScoped<NavigationService>();
