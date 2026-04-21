@@ -1,13 +1,30 @@
-@model MTS.RazorStarter.Pages.Engineering.FramePartModel.PartDetailViewModel
+@model MTS.RazorStarter.Models.FramePartViewModel
 
 <section>
     <h3 class="panel-title">Drawing Viewer</h3>
 
-    @if (Model.HasDrawing && !string.IsNullOrWhiteSpace(Model.DrawingPath))
+    @if (Model.HasPrimaryDrawing && !string.IsNullOrWhiteSpace(Model.DrawingOpenUrl))
     {
-        <iframe class="drawing-frame" src="@Model.DrawingPath" title="Primary drawing"></iframe>
-        <div style="margin-top:0.8rem;">
-            <a class="part-btn" href="@Model.DrawingPath" target="_blank" rel="noopener noreferrer">Open Full Drawing</a>
+        <div class="drawing-toolbar" data-drawing-toolbar>
+            <div class="drawing-toolbar-group">
+                <button type="button" class="part-btn" data-zoom-out>−</button>
+                <button type="button" class="part-btn" data-zoom-in>+</button>
+                <button type="button" class="part-btn" data-zoom-reset>Reset</button>
+                <span class="zoom-level" data-zoom-level>100%</span>
+            </div>
+            <div class="drawing-toolbar-group">
+                <a class="part-btn" href="@Model.DrawingOpenUrl" target="_blank" rel="noopener noreferrer">Open in New Tab</a>
+                @if (!string.IsNullOrWhiteSpace(Model.DrawingDownloadUrl))
+                {
+                    <a class="part-btn part-btn-primary" href="@Model.DrawingDownloadUrl">Download</a>
+                }
+            </div>
+        </div>
+
+        <div class="drawing-viewer-outer" data-drawing-viewport>
+            <div class="drawing-viewer-inner" data-drawing-scaled>
+                <iframe class="drawing-frame" src="@Model.DrawingOpenUrl" title="Primary drawing - @Model.PrimaryDrawingFileName"></iframe>
+            </div>
         </div>
     }
     else

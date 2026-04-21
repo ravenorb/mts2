@@ -1,0 +1,32 @@
+@model MTS.RazorStarter.Models.FramePartViewModel
+
+<section>
+    <h3 class="panel-title">Part Summary</h3>
+    <div class="overview-grid">
+        <div class="overview-item">
+            <div class="overview-label">Item Number</div>
+            <div class="overview-value">@Model.ItemNo</div>
+        </div>
+        <div class="overview-item">
+            <div class="overview-label">Title</div>
+            <div class="overview-value">@Model.Title</div>
+        </div>
+        <div class="overview-item">
+            <div class="overview-label">Revisions</div>
+            <div class="overview-value">@string.Join(", ", Model.Revisions)</div>
+        </div>
+        <div class="overview-item">
+            <div class="overview-label">Cut Sheet Count</div>
+            <div class="overview-value">@Model.CutSheets.Count</div>
+        </div>
+        <div class="overview-item">
+            <div class="overview-label">Has Drawing</div>
+            <div class="overview-value">@(Model.HasPrimaryDrawing ? "Yes" : "No")</div>
+        </div>
+    </div>
+
+    <section class="overview-bom-section">
+        <h3 class="panel-title">Bill of Materials</h3>
+        <partial name="PartComponents/_BomTable" model="Model.BomRows" />
+    </section>
+</section>

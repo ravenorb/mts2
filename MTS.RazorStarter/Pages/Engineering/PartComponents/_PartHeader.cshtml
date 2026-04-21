@@ -1,6 +1,6 @@
-@model MTS.RazorStarter.Pages.Engineering.FramePartModel.PartDetailViewModel
+@model MTS.RazorStarter.Models.FramePartViewModel
 @{
-    var isReleased = string.Equals(Model.Status, "Released", StringComparison.OrdinalIgnoreCase);
+    var isReleased = string.Equals(Model.CurrentRevisionStatus, "Released", StringComparison.OrdinalIgnoreCase);
 }
 
 <header class="part-card part-header">
@@ -8,8 +8,8 @@
         <h1 class="part-id">@Model.ItemNo</h1>
         <p class="part-title">@Model.Title</p>
         <div class="part-meta-line">
-            <span class="badge badge-revision">Revision @Model.CurrentRevision</span>
-            <span class="badge @(isReleased ? "badge-status-released" : "badge-status-draft")">@Model.Status</span>
+            <span class="badge badge-revision">Revision @Model.CurrentRevisionCode</span>
+            <span class="badge @(isReleased ? "badge-status-released" : "badge-status-draft")">@Model.CurrentRevisionStatus</span>
         </div>
     </div>
     <div class="part-action-row">

@@ -2,27 +2,44 @@ namespace MTS.RazorStarter.Models;
 
 public class FramePartViewModel
 {
-    public string ItemNo { get; set; } = "";
-    public string Title { get; set; } = "";
+    public string ItemNo { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public List<RevisionVM> Revisions { get; set; } = new();
+    public int CurrentRevisionId { get; set; }
+    public string CurrentRevisionCode { get; set; } = "N/A";
+    public string CurrentRevisionStatus { get; set; } = "Draft";
+    public List<string> Revisions { get; set; } = new();
 
-    public class RevisionVM
-    {
-        public string RevisionCode { get; set; } = "";
-        public bool IsCurrent { get; set; }
-        public string ReleaseState { get; set; } = "Draft";
-        public DateTime CreatedAt { get; set; }
-        public string? DrawingPath { get; set; }
-        public List<CutSheetVM> CutSheets { get; set; } = new();
-    }
+    public string? PrimaryDrawingFileName { get; set; }
+    public string? PrimaryDrawingPath { get; set; }
+    public bool HasPrimaryDrawing { get; set; }
+    public string? DrawingDownloadUrl { get; set; }
+    public string? DrawingOpenUrl { get; set; }
 
-    public class CutSheetVM
-    {
-        public string FileName { get; set; } = "";
-        public string FilePath { get; set; } = "";
-        public string Type { get; set; } = "Laser";
-    }
+    public List<CutSheetVm> CutSheets { get; set; } = new();
+    public List<BomRowVm> BomRows { get; set; } = new();
+}
+
+public class CutSheetVm
+{
+    public string FileName { get; set; } = string.Empty;
+    public string Type { get; set; } = "ManufacturedFrom";
+    public string? ViewPath { get; set; }
+}
+
+public class BomRowVm
+{
+    public int ParentRevisionId { get; set; }
+    public int ChildRevisionId { get; set; }
+    public string? FindNo { get; set; }
+    public string ItemNo { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string RevisionCode { get; set; } = string.Empty;
+    public decimal Qty { get; set; }
+    public string BomRole { get; set; } = string.Empty;
+    public string? Notes { get; set; }
+    public bool HasChildren { get; set; }
+    public List<BomRowVm> Children { get; set; } = new();
 }
