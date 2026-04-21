@@ -220,7 +220,6 @@ public class MtsDbContext : DbContext
             e.Property(x => x.LinkType).HasColumnName("link_type").HasConversion<string>().IsRequired();
             e.Property(x => x.IsPrimary).HasColumnName("is_primary").IsRequired();
             e.Property(x => x.Notes).HasColumnName("notes");
-            e.Property(x => x.SourceType).HasColumnName("source_type").HasConversion<string>().IsRequired();
 
             e.HasIndex(x => new { x.FramePartRevisionId, x.CutSheetRevisionId, x.LinkType }).IsUnique();
 
